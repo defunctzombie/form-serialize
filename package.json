@@ -1,0 +1,40 @@
+{
+  "name": "form-serialize",
+  "version": "0.0.0",
+  "description": "serialize html forms",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "devDependencies": {
+    "mocha": "~1.13.0",
+    "domify": "~1.0.0",
+    "zuul": "~0.2.1"
+  },
+  "scripts": {
+    "test": "zuul --ui tdd test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/shtylman/form-serialize.git"
+  },
+  "keywords": [
+    "form",
+    "serialize"
+  ],
+  "author": "Roman Shtylman <shtylman@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/shtylman/form-serialize/issues"
+  },
+  "testling": {
+    "harness": "mocha-tdd",
+    "files": "test/*.js",
+    "browsers": [
+      "ie/9..latest",
+      "chrome/20..latest",
+      "firefox/4..latest",
+      "safari/5.0..latest"
+    ]
+  }
+}
