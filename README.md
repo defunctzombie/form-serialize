@@ -38,14 +38,14 @@ var obj = serialiez(form, { hash: true });
 Returns a serialized form of a HTMLForm element. Output is determined by the serializer used. Default serializer is url-encoded.
 
 arg | type | desc
-:- | :- | :-
+:--- | :--- | :---
 form | HTMLForm | must be an HTMLForm element
 options | Object | optional options object
 
 #### options
 
 option | type | desc
-:- | :- | :-
+:--- | :--- | :---
 hash | boolean | if true, the default hash serializer will be used
 serializer | function | provide a custom serializer
 
