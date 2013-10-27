@@ -105,3 +105,50 @@ test('select - multiple', function() {
     });
     str_check(form, 'foo=bar&foo=cat');
 });
+
+test('radio - no default', function() {
+    var form = domify('<form>' +
+        '<input type="radio" name="foo" value="bar1"/>' +
+        '<input type="radio" name="foo" value="bar2"/>' +
+        '</form>');
+    hash_check(form, {});
+    str_check(form, '');
+});
+
+test('radio - single default', function() {
+    var form = domify('<form>' +
+        '<input type="radio" name="foo" value="bar1" checked="checked"/>' +
+        '<input type="radio" name="foo" value="bar2"/>' +
+        '</form>');
+    hash_check(form, {
+        foo: 'bar1'
+    });
+    str_check(form, 'foo=bar1');
+});
+
+// in this case the radio buttons and checkboxes share a name key
+// the checkbox value should still be honored
+test('radio w/checkbox', function() {
+    var form = domify('<form>' +
+        '<input type="radio" name="foo" value="bar1" checked="checked"/>' +
+        '<input type="radio" name="foo" value="bar2"/>' +
+        '<input type="checkbox" name="foo" value="bar3" checked="checked"/>' +
+        '<input type="checkbox" name="foo" value="bar4"/>' +
+        '</form>');
+    hash_check(form, {
+        foo: ['bar1', 'bar3']
+    });
+    str_check(form, 'foo=bar1&foo=bar3');
+
+    // leading checkbox
+    var form = domify('<form>' +
+        '<input type="checkbox" name="foo" value="bar3" checked="checked"/>' +
+        '<input type="radio" name="foo" value="bar1" checked="checked"/>' +
+        '<input type="radio" name="foo" value="bar2"/>' +
+        '<input type="checkbox" name="foo" value="bar4"/>' +
+        '</form>');
+    hash_check(form, {
+        foo: ['bar3', 'bar1']
+    });
+    str_check(form, 'foo=bar3&foo=bar1');
+});
