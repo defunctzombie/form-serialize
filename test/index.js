@@ -11,6 +11,10 @@ var str_check = function(form, exp) {
     assert.equal(serialize(form), exp);
 };
 
+var disabled_check = function(form, exp) {
+	assert.deepEqual(serialize(form, { hash : false, disabled: true }), exp);
+};
+
 test('nothing', function() {
     var form = domify('<form></form>');
     hash_check(form, {});
@@ -46,7 +50,7 @@ test('multi inputs', function() {
     str_check(form, 'foo=bar+1&foo.bar=bar+2&baz.foo=bar+3');
 });
 
-test('ignore disabled', function() {
+test('handle disabled', function() {
     var form = domify('<form>' +
         '<input type="text" name="foo" value="bar 1"/>' +
         '<input type="text" name="foo.bar" value="bar 2" disabled/>' +
@@ -55,6 +59,7 @@ test('ignore disabled', function() {
         'foo': 'bar 1'
     });
     str_check(form, 'foo=bar+1');
+    disabled_check(form, 'foo=bar+1&foo.bar=bar+2');
 });
 
 test('ignore buttons', function() {

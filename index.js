@@ -17,6 +17,7 @@ var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 //    - serializer: [function] Optional serializer function to override the default one.
 //    The function takes 3 arguments (result, key, value) and should return new result
 //    hash and url encoded str serializers are provided with this module
+//    - disabled: [true | false]. If true serialize disabled fields.
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -34,7 +35,7 @@ function serialize(form, options) {
         var element = elements[i];
 
         // ingore disabled fields
-        if (element.disabled || !element.name) {
+        if ((!options.disabled && element.disabled) || !element.name) {
             continue;
         }
         // ignore anyhting that is not considered a success field
