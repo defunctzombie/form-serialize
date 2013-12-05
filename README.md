@@ -1,6 +1,4 @@
-# form-serialize
-
-[![badge](https://ci.testling.com/shtylman/form-serialize.png)](https://ci.testling.com/shtylman/form-serialize)
+# form-serialize [![Build Status](https://travis-ci.org/defunctzombie/form-serialize.png?branch=master)](https://travis-ci.org/defunctzombie/form-serialize)
 
 serialize form fields to submit a form over ajax
 
