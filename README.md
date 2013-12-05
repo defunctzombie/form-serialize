@@ -29,7 +29,7 @@ var form = document.querySelector('#example-form');
 var str = serialize(form);
 // str -> "foo=bar"
 
-var obj = serialiez(form, { hash: true });
+var obj = serialize(form, { hash: true });
 // obj -> { foo: 'bar' }
 ```
 
