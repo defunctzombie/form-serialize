@@ -11,7 +11,7 @@
     "zuul": "~1.0.4"
   },
   "scripts": {
-    "test": "zuul --ui tdd test/*.js"
+    "test": "zuul -- test/index.js"
   },
   "repository": {
     "type": "git",
@@ -25,15 +25,5 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/shtylman/form-serialize/issues"
-  },
-  "testling": {
-    "harness": "mocha-tdd",
-    "files": "test/*.js",
-    "browsers": [
-      "ie/9..latest",
-      "chrome/20..latest",
-      "firefox/4..latest",
-      "safari/5.0..latest"
-    ]
   }
 }
