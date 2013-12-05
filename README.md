@@ -44,10 +44,11 @@ options | Object | optional options object
 
 #### options
 
-option | type | desc
-:--- | :--- | :---
-hash | boolean | if true, the default hash serializer will be used
-serializer | function | provide a custom serializer
+option | type | default | desc
+:--- | :--- | :---: | :---
+hash | boolean | false | if `true`, the hash serializer will be used for `serializer` option
+serializer | function | url-encoding | override the default serializer (hash or url-encoding)
+disabled | boolean | false | if `true`, disabled fields will also be serialized
 
 ### custom serializer
 
