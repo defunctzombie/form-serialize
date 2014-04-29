@@ -157,3 +157,29 @@ test('radio w/checkbox', function() {
     });
     str_check(form, 'foo=bar3&foo=bar1');
 });
+
+test('nested hashes with brackets', function() {
+  var form = domify('<form>' +
+      '<input type="email" name="account[name]" value="Foo Dude">' +
+      '<input type="text" name="account[email]" value="foobar@example.org">' +
+      '<input type="text" name="account[address][city]" value="Qux">' +
+      '<select name="beer[type]" multiple>' +
+      '  <option value="ipa" selected>IPA</option>' +
+      '  <option value="pale-ale">Pale Ale</option>' +
+      '  <option value="amber-ale" selected>Amber Ale</option>' +
+      '</select>' +
+      '</form>');
+
+  hash_check(form, {
+      account: {
+          name: 'Foo Dude',
+          email: 'foobar@example.org',
+          address: {
+              city: 'Qux'
+          }
+      },
+      beer: {
+          type: [ 'ipa', 'amber-ale' ]
+      }
+  });
+});

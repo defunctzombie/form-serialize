@@ -8,6 +8,10 @@ var k_r_submitter = /^(?:submit|button|image|reset|file)$/i;
 // node names which could be successful controls
 var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 
+// keys with brackets for hash keys
+var brackets_regex = /\[(.+?)\]/g;
+var brackeks_prefix_regex = /^(.+?)\[/;
+
 // serializes form fields
 // @param form MUST be an HTMLForm element
 // @param options is an optional argument to configure the serialization. Default output
@@ -89,7 +93,12 @@ function hash_serializer(result, key, value) {
         result[key].push(value);
     }
     else {
-        result[key] = value;
+        if (has_brackets(key)) {
+          extract_from_brackets(result, key, value);
+        }
+        else {
+          result[key] = value;
+        }
     }
 
     return result;
@@ -104,6 +113,63 @@ function str_serialize(result, key, value) {
     // spaces should be '+' rather than '%20'.
     value = value.replace(/%20/g, '+');
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
+};
+
+function has_brackets(string) {
+  return string.match(brackets_regex);
+};
+
+function matches_between_brackets(string) {
+    // Make sure to isolate brackets_regex from .exec() calls
+    var regex = new RegExp(brackets_regex);
+    var matches = [];
+    var match;
+
+    while (match = regex.exec(string)) {
+      matches.push(match[1]);
+    }
+
+    return matches;
+};
+
+function extract_from_brackets(result, key, value) {
+    var prefix = key.match(brackeks_prefix_regex)[1];
+
+    // Set the key if it doesn't exist
+    if (! result[prefix]) result[prefix] = {};
+
+    var parent = result[prefix];
+    var matches_between = matches_between_brackets(key);
+    var length = matches_between.length;
+
+    for (var i = 0; i < length; i++) {
+        var child = matches_between[i];
+        var isLast = (length === i + 1);
+
+        if (isLast) {
+            var existing = parent[child];
+
+            if (existing) {
+                if (! Array.isArray(existing)) {
+                    parent[child] = [ existing ];
+                }
+
+                parent[child].push(value);
+            }
+            else {
+                // Finally make the assignment
+                parent[child] = value;
+            }
+
+        }
+        else {
+            // This is a nested key, set it properly for the next iteration
+            parent[child] = {};
+            parent = parent[child];
+        }
+    }
+
+    parent = value;
 };
 
 module.exports = serialize;
