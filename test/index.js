@@ -8,11 +8,13 @@ var hash_check = function(form, exp) {
 };
 
 var str_check = function(form, exp) {
+    console.log(serialize(form));
+    console.log(exp);
     assert.equal(serialize(form), exp);
 };
 
 var disabled_check = function(form, exp) {
-	assert.deepEqual(serialize(form, { hash : false, disabled: true }), exp);
+    assert.deepEqual(serialize(form, { hash : false, disabled: true }), exp);
 };
 
 test('nothing', function() {
@@ -159,27 +161,28 @@ test('radio w/checkbox', function() {
 });
 
 test('nested hashes with brackets', function() {
-  var form = domify('<form>' +
-      '<input type="email" name="account[name]" value="Foo Dude">' +
-      '<input type="text" name="account[email]" value="foobar@example.org">' +
-      '<input type="text" name="account[address][city]" value="Qux">' +
-      '<select name="beer[type]" multiple>' +
-      '  <option value="ipa" selected>IPA</option>' +
-      '  <option value="pale-ale">Pale Ale</option>' +
-      '  <option value="amber-ale" selected>Amber Ale</option>' +
-      '</select>' +
-      '</form>');
+    var form = domify('<form>' +
+        '<input type="email" name="account[name]" value="Foo Dude">' +
+        '<input type="text" name="account[email]" value="foobar@example.org">' +
+        '<input type="text" name="account[address][city]" value="Qux">' +
+        '<select name="beer[type]" multiple>' +
+        '  <option value="ipa" selected>IPA</option>' +
+        '  <option value="pale-ale">Pale Ale</option>' +
+        '  <option value="amber-ale" selected>Amber Ale</option>' +
+        '</select>' +
+        '</form>');
 
-  hash_check(form, {
-      account: {
-          name: 'Foo Dude',
-          email: 'foobar@example.org',
-          address: {
-              city: 'Qux'
-          }
-      },
-      beer: {
-          type: [ 'ipa', 'amber-ale' ]
-      }
-  });
+    hash_check(form, {
+        account: {
+        name: 'Foo Dude',
+        email: 'foobar@example.org',
+        address: {
+            city: 'Qux'
+        }
+        },
+        beer: {
+            type: [ 'ipa', 'amber-ale' ]
+        }
+    });
+    str_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale');
 });
