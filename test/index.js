@@ -8,8 +8,6 @@ var hash_check = function(form, exp) {
 };
 
 var str_check = function(form, exp) {
-    console.log(serialize(form));
-    console.log(exp);
     assert.equal(serialize(form), exp);
 };
 
