@@ -1,4 +1,4 @@
-# unreleased
+# 0.3.0 / 2014-05-01
 
 * support bracket notation for hash serialization
 
