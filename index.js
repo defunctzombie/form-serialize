@@ -23,6 +23,8 @@ var brackeks_prefix_regex = /^(.+?)\[/;
 //    The function takes 3 arguments (result, key, value) and should return new result
 //    hash and url encoded str serializers are provided with this module
 //    - disabled: [true | false]. If true serialize disabled fields.
+//    - empty: [true | false].  If true, serialize empty fields.  Default is false.
+//
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -54,12 +56,12 @@ function serialize(form, options) {
 
         // we can't just use element.value for checkboxes cause some browsers lie to us
         // they say "on" for value when the box isn't checked
-        if ((element.type === 'checkbox' || element.type === 'radio') && !element.checked) {
-            val = undefined;
+        if (element.type === 'checkbox' || element.type === 'radio') {
+            val = element.checked;
         }
 
-        // value-less fields are ignored
-        if (!val) {
+        // value-less fields are ignored unless options.empty is true
+        if (!val && !options.empty) {
             continue;
         }
 
