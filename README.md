@@ -62,6 +62,33 @@ only [successfull control](http://www.w3.org/TR/html401/interact/forms.html#h-17
 
 multiselect fields with more than one value will result in an array of values in the `hash` output mode using the default hash serializer
 
+### explicit array fields
+
+Fields who's name ends with `[]` are **always** serialized as an array field in `hash` output mode using the default hash serializer.
+The field name also gets the brackets removed from its name.
+
+This does not affect `url-encoding` mode output in any way.
+
+```html
+<form id="example-form">
+	<input type="checkbox" name="foo[]" value="bar" checked />
+	<input type="checkbox" name="foo[]" value="baz" />
+	<input type="submit" value="do it!"/>
+</form>
+```
+
+```js
+var serialize = require('form-serialize');
+var form = document.querySelector('#example-form');
+
+var obj = serialize(form, { hash: true });
+// obj -> { foo: ['bar'] }
+
+var str = serialize(form);
+// str -> "foo[]=bar"
+
+```
+
 ## references
 
 This module is based on ideas from jQuery serialize and the Form.serialize method from the prototype library
