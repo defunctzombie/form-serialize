@@ -9,7 +9,8 @@ var k_r_submitter = /^(?:submit|button|image|reset|file)$/i;
 var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 
 // keys with brackets for hash keys
-var brackets_regex = /\[(.+?)\]/g;
+var object_brackets_regex = /\[(.+?)\]/g;
+var array_brackets_regex = /\[\]$/;
 var brackeks_prefix_regex = /^(.+?)\[/;
 
 // serializes form fields
@@ -85,6 +86,11 @@ function serialize(form, options) {
 
 // obj/hash encoding serializer
 function hash_serializer(result, key, value) {
+    var is_array_key = has_array_brackets(key);
+    if (is_array_key) {
+        key = key.replace(array_brackets_regex, '');
+    }
+
     if (key in result) {
         var existing = result[key];
         if (!Array.isArray(existing)) {
@@ -93,11 +99,11 @@ function hash_serializer(result, key, value) {
         result[key].push(value);
     }
     else {
-        if (has_brackets(key)) {
+        if (has_object_brackets(key)) {
           extract_from_brackets(result, key, value);
         }
         else {
-          result[key] = value;
+          result[key] = is_array_key ? [value] : value;
         }
     }
 
@@ -115,13 +121,17 @@ function str_serialize(result, key, value) {
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
 };
 
-function has_brackets(string) {
-  return string.match(brackets_regex);
+function has_object_brackets(string) {
+  return string.match(object_brackets_regex);
 };
 
+function has_array_brackets(string) {
+    return string.match(array_brackets_regex);
+}
+
 function matches_between_brackets(string) {
-    // Make sure to isolate brackets_regex from .exec() calls
-    var regex = new RegExp(brackets_regex);
+    // Make sure to isolate object_brackets_regex from .exec() calls
+    var regex = new RegExp(object_brackets_regex);
     var matches = [];
     var match;
 

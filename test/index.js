@@ -84,6 +84,27 @@ test('checkboxes', function() {
     str_check(form, 'foo=on&baz=on');
 });
 
+test('checkboxes - array', function() {
+    var form = domify('<form>' +
+        '<input type="checkbox" name="foo[]" value="bar" checked/>' +
+        '<input type="checkbox" name="foo[]" value="baz" checked/>' +
+        '</form>');
+    hash_check(form, {
+        'foo': ['bar', 'baz']
+    });
+    str_check(form, 'foo%5B%5D=bar&foo%5B%5D=baz');
+});
+
+test('checkboxes - array with single item', function() {
+    var form = domify('<form>' +
+        '<input type="checkbox" name="foo[]" value="bar" checked/>' +
+        '</form>');
+    hash_check(form, {
+        'foo': ['bar']
+    });
+    str_check(form, 'foo%5B%5D=bar');
+});
+
 test('select - single', function() {
     var form = domify('<form>' +
         '<select name="foo">' +
