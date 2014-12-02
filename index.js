@@ -68,8 +68,8 @@ function serialize(form, options) {
             val = [];
 
             var options = element.options;
-            for (var i=0 ; i<options.length ; ++i) {
-                var option = options[i];
+            for (var j=0 ; j<options.length ; ++j) {
+                var option = options[j];
                 if (option.selected) {
                     result = serializer(result, key, option.value);
                 }
