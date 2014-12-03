@@ -1,5 +1,8 @@
 # unreleased
 
+* consistently serialize [] params into arrays
+* fix multi-select field support
+
 # 0.3.0 / 2014-05-01
 
 * support bracket notation for hash serialization
