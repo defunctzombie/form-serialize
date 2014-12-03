@@ -67,9 +67,9 @@ function serialize(form, options) {
         if (element.type === 'select-multiple') {
             val = [];
 
-            var options = element.options;
-            for (var i=0 ; i<options.length ; ++i) {
-                var option = options[i];
+            var selectOptions = element.options;
+            for (var j=0 ; j<selectOptions.length ; ++j) {
+                var option = selectOptions[j];
                 if (option.selected) {
                     result = serializer(result, key, option.value);
                 }
