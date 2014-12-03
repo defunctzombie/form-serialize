@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "domify": "~1.0.0",
-    "zuul": "~1.6.4"
+    "zuul": "~1.15.0"
   },
   "scripts": {
     "test": "zuul -- test/index.js"
