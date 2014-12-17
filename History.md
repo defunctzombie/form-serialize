@@ -1,4 +1,4 @@
-# unreleased
+# 0.4.0 (2014-12-16)
 
 * consistently serialize [] params into arrays
 * fix multi-select field support
