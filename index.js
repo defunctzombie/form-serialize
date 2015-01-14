@@ -174,7 +174,7 @@ function extract_from_brackets(result, key, value) {
         }
         else {
             // This is a nested key, set it properly for the next iteration
-            parent[child] = {};
+            parent[child] = parent[child] || {};
             parent = parent[child];
         }
     }
