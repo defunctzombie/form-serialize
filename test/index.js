@@ -184,6 +184,7 @@ test('nested hashes with brackets', function() {
         '<input type="email" name="account[name]" value="Foo Dude">' +
         '<input type="text" name="account[email]" value="foobar@example.org">' +
         '<input type="text" name="account[address][city]" value="Qux">' +
+        '<input type="text" name="account[address][state]" value="CA">' +
         '<select name="beer[type]" multiple>' +
         '  <option value="ipa" selected>IPA</option>' +
         '  <option value="pale-ale">Pale Ale</option>' +
@@ -196,12 +197,13 @@ test('nested hashes with brackets', function() {
         name: 'Foo Dude',
         email: 'foobar@example.org',
         address: {
-            city: 'Qux'
+            city: 'Qux',
+            state: 'CA'
         }
         },
         beer: {
             type: [ 'ipa', 'amber-ale' ]
         }
     });
-    str_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale');
+    str_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&account%5Baddress%5D%5Bstate%5D=CA&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale');
 });
