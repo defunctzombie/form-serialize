@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.4.1 (2015-01-15)
 
 * fix nested [][] serialization
 
