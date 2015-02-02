@@ -32,7 +32,7 @@ function serialize(form, options) {
     }
 
     var result = (options.hash) ? {} : '';
-    var serializer = options.serializer || (options.hash) ? hash_serializer : str_serialize;
+    var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
 
     var elements = form.elements || [];
 
