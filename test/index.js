@@ -207,3 +207,16 @@ test('nested hashes with brackets', function() {
     });
     str_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&account%5Baddress%5D%5Bstate%5D=CA&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale');
 });
+
+test('custom serializer', function() {
+  var form = domify('<form><input type="text" name="node" value="zuul">/</form>');
+
+  assert.deepEqual(serialize(form, {
+    serializer: function(curry, k, v) {
+      curry[k] = 'ZUUL';
+      return curry;
+    }
+  }), {
+    "node": "ZUUL"
+  });
+});
