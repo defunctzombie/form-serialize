@@ -23,6 +23,7 @@ var brackeks_prefix_regex = /^(.+?)\[/;
 //    The function takes 3 arguments (result, key, value) and should return new result
 //    hash and url encoded str serializers are provided with this module
 //    - disabled: [true | false]. If true serialize disabled fields.
+//    - empty: [true | false]. If true serialize empty fields
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -35,6 +36,9 @@ function serialize(form, options) {
     var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
 
     var elements = form.elements || [];
+
+    //Object store each radio and set if it's empty or not
+    var radio_store = Object.create(null);
 
     for (var i=0 ; i<elements.length ; ++i) {
         var element = elements[i];
@@ -57,10 +61,34 @@ function serialize(form, options) {
         if ((element.type === 'checkbox' || element.type === 'radio') && !element.checked) {
             val = undefined;
         }
+        
+        // If we want empty elements
+        if (options.empty) {
+            // for checkbox
+            if (element.type === 'checkbox' && !element.checked) {
+                val = '';
+            }
 
-        // value-less fields are ignored
-        if (!val) {
-            continue;
+            // for radio
+            if (element.type === 'radio') {
+                if (!radio_store[element.name] && !element.checked) {
+                    radio_store[element.name] = false
+                }
+                else if (element.checked) {
+                    radio_store[element.name] = true
+                }
+            }
+
+            // if options empty is true, continue only if its radio
+            if (!val && element.type == 'radio') {
+                continue;
+            }
+        }
+        else {
+            // value-less fields are ignored unless options.empty is true
+            if (!val) {
+                continue;
+            }
         }
 
         // multi select boxes
@@ -68,17 +96,32 @@ function serialize(form, options) {
             val = [];
 
             var selectOptions = element.options;
+            var isSelectedOptions = false;
             for (var j=0 ; j<selectOptions.length ; ++j) {
                 var option = selectOptions[j];
                 if (option.selected) {
+                    isSelectedOptions = true
                     result = serializer(result, key, option.value);
                 }
             }
 
+            // Serialize if no selected options and options.empty is true
+            if (!isSelectedOptions && options.empty) {
+                result = serializer(result, key, '');
+            }
+            
             continue;
         }
-
         result = serializer(result, key, val);
+    }
+
+    // Check for all empty radio buttons and serialize them with key=""
+    if (options.empty) {
+        for (var key in radio_store) {
+            if (!radio_store[key]) {
+                result = serializer(result, key, '');
+            }
+        }
     }
 
     return result;
