@@ -1,3 +1,7 @@
+# UNRELEASED
+
+* add options.empty to force serialize empty inputs
+
 # 0.5.0 (2015-02-08)
 
 * fix specifying custom serializer
