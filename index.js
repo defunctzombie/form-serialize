@@ -236,7 +236,7 @@ function serialize(form, options) {
 }
 
 if (module === undefined) {
-    window.serialize = serialize;
+    window.formSerialize = serialize;
 }
 else {
     module.exports = serialize;
