@@ -1,0 +1,16 @@
+{
+  "name": "form-serialize",
+  "version": "0.6.0",
+  "main": "index.js",
+  "ignore": [],
+  "authors": [
+    "Roman Shtylman <shtylman@gmail.com>",
+    "Brett Zamir <brettz9@yahoo.com>"
+  ],
+  "description": "serialize html forms",
+  "keywords": [
+    "form",
+    "serialize"
+  ],
+  "license": "MIT"
+}
