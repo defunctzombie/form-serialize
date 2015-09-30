@@ -11,7 +11,7 @@ var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 // keys with brackets for hash keys
 var object_brackets_regex = /\[(.+?)\]/g;
 var array_brackets_regex = /\[\]$/;
-var brackeks_prefix_regex = /^(.+?)\[/;
+var brackets_prefix_regex = /^(.+?)\[/;
 
 // serializes form fields
 // @param form MUST be an HTMLForm element
@@ -186,7 +186,7 @@ function matches_between_brackets(string) {
 };
 
 function extract_from_brackets(result, key, value) {
-    var prefix = key.match(brackeks_prefix_regex)[1];
+    var prefix = key.match(brackets_prefix_regex)[1];
 
     // Set the key if it doesn't exist
     if (! result[prefix]) result[prefix] = {};
