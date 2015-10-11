@@ -23,7 +23,22 @@ var empty_check_hash = function(form, exp) {
     assert.deepEqual(serialize(form, { hash : true, disabled: true, empty: true }), exp);
 };
 
-test('nothing', function() {
+test('null form', function() {
+    hash_check(null, {});
+    str_check(null, '');
+    empty_check(null, '');
+    empty_check_hash(null, {});
+});
+
+test('bad form', function() {
+    var form = {};
+    hash_check(form, {});
+    str_check(form, '');
+    empty_check(form, '');
+    empty_check_hash(form, {});
+});
+
+test('empty form', function() {
     var form = domify('<form></form>');
     hash_check(form, {});
     str_check(form, '');
@@ -256,70 +271,195 @@ test('radio w/checkbox', function() {
     str_check(form, 'foo=bar1&foo=bar3');
 
     // leading checkbox
-    var form = domify('<form>' +
+    form = domify('<form>' +
         '<input type="checkbox" name="foo" value="bar3" checked="checked"/>' +
         '<input type="radio" name="foo" value="bar1" checked="checked"/>' +
         '<input type="radio" name="foo" value="bar2"/>' +
         '<input type="checkbox" name="foo" value="bar4"/>' +
+        '<input type="checkbox" name="foo" value="bar5" checked="checked"/>' +
         '</form>');
     hash_check(form, {
-        foo: ['bar3', 'bar1']
+        foo: ['bar3', 'bar1', 'bar5']
     });
-    str_check(form, 'foo=bar3&foo=bar1');
+    str_check(form, 'foo=bar3&foo=bar1&foo=bar5');
 });
 
-test('nested hashes with brackets', function() {
+test('bracket notation - hashes', function() {
     var form = domify('<form>' +
         '<input type="email" name="account[name]" value="Foo Dude">' +
         '<input type="text" name="account[email]" value="foobar@example.org">' +
         '<input type="text" name="account[address][city]" value="Qux">' +
         '<input type="text" name="account[address][state]" value="CA">' +
         '<input type="text" name="account[address][empty]" value="">' +
-        '<select name="beer[type]" multiple>' +
-        '  <option value="ipa" selected>IPA</option>' +
-        '  <option value="pale-ale">Pale Ale</option>' +
-        '  <option value="amber-ale" selected>Amber Ale</option>' +
-        '</select>' +
-        '<select name="wine[type]" multiple>' +
-        '  <option value="">No wine</option>' +
-        '  <option value="white">White</option>' +
-        '  <option value="red">Red</option>' +
-        '  <option value="sparkling">Sparkling</option>' +
-        '</select>' +
         '</form>');
 
     hash_check(form, {
         account: {
-        name: 'Foo Dude',
-        email: 'foobar@example.org',
-        address: {
-            city: 'Qux',
-            state: 'CA'
-        }
-        },
-        beer: {
-            type: [ 'ipa', 'amber-ale' ]
+            name: 'Foo Dude',
+            email: 'foobar@example.org',
+            address: {
+                city: 'Qux',
+                state: 'CA'
+            }
         }
     });
+
     empty_check_hash(form, {
         account: {
-        name: 'Foo Dude',
-        email: 'foobar@example.org',
-        address: {
-            city: 'Qux',
-            state: 'CA',
-            empty: ''
-        }
-        },
-        beer: {
-            type: [ 'ipa', 'amber-ale' ]
-        },
-        wine: {
-            type: ""
+            name: 'Foo Dude',
+            email: 'foobar@example.org',
+            address: {
+                city: 'Qux',
+                state: 'CA',
+                empty: ''
+            }
         }
     });
-    str_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&account%5Baddress%5D%5Bstate%5D=CA&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale');
-    empty_check(form, 'account%5Bname%5D=Foo+Dude&account%5Bemail%5D=foobar%40example.org&account%5Baddress%5D%5Bcity%5D=Qux&account%5Baddress%5D%5Bstate%5D=CA&account%5Baddress%5D%5Bempty%5D=&beer%5Btype%5D=ipa&beer%5Btype%5D=amber-ale&wine%5Btype%5D=')
+});
+
+test('bracket notation - select multiple', function() {
+    var form = domify('<form>' +
+        '<select name="foo" multiple>' +
+        '  <option value="bar" selected>Bar</option>' +
+        '  <option value="baz">Baz</option>' +
+        '  <option value="qux" selected>Qux</option>' +
+        '</select>' +
+        '</form>');
+
+    hash_check(form, {
+        foo: [ 'bar', 'qux' ]
+    });
+
+    // Trailing notation on select.name.
+    form = domify('<form>' +
+        '<select name="foo[]" multiple>' +
+        '  <option value="bar" selected>Bar</option>' +
+        '  <option value="baz">Baz</option>' +
+        '  <option value="qux" selected>Qux</option>' +
+        '</select>' +
+        '</form>');
+
+    hash_check(form, {
+        foo: [ 'bar', 'qux' ]
+    });
+});
+
+
+test('bracket notation - select multiple, nested', function() {
+    var form = domify('<form>' +
+        '<select name="foo[bar]" multiple>' +
+        '  <option value="baz" selected>Baz</option>' +
+        '  <option value="qux">Qux</option>' +
+        '  <option value="norf" selected>Norf</option>' +
+        '</select>' +
+        '</form>');
+
+    hash_check(form, {
+        foo: {
+            bar: [ 'baz', 'norf' ]
+        }
+    });
+});
+
+test('bracket notation - select multiple, empty values', function() {
+    var form = domify('<form>' +
+        '<select name="foo[bar]" multiple>' +
+        '  <option selected>Default value</option>' +
+        '  <option value="" selected>Empty value</option>' +
+        '  <option value="baz" selected>Baz</option>' +
+        '  <option value="qux">Qux</option>' +
+        '  <option value="norf" selected>Norf</option>' +
+        '</select>' +
+        '</form>');
+
+    hash_check(form, {
+        foo: {
+            bar: [ 'Default value', 'baz', 'norf' ]
+        }
+    });
+
+    empty_check_hash(form, {
+        foo: {
+            bar: [ 'Default value', '', 'baz', 'norf' ]
+        }
+    });
+});
+
+test('bracket notation - non-indexed arrays', function() {
+    var form = domify('<form>' +
+        '<input name="people[][name]" value="fred" />' +
+        '<input name="people[][name]" value="bob" />' +
+        '<input name="people[][name]" value="bubba" />' +
+        '</form>');
+
+    hash_check(form, {
+        people: [
+            { name: "fred" },
+            { name: "bob" },
+            { name: "bubba" },
+        ]
+    });
+});
+
+test('bracket notation - nested, non-indexed arrays', function() {
+    var form = domify('<form>' +
+        '<input name="user[tags][]" value="cow" />' +
+        '<input name="user[tags][]" value="milk" />' +
+        '</form>');
+
+    hash_check(form, {
+        user: {
+            tags: [ "cow", "milk" ],
+        }
+    });
+});
+
+test('bracket notation - indexed arrays', function() {
+    var form = domify('<form>' +
+        '<input name="people[2][name]" value="bubba" />' +
+        '<input name="people[2][age]" value="15" />' +
+        '<input name="people[0][name]" value="fred" />' +
+        '<input name="people[0][age]" value="12" />' +
+        '<input name="people[1][name]" value="bob" />' +
+        '<input name="people[1][age]" value="14" />' +
+        '<input name="people[][name]" value="frank">' +
+        '<input name="people[3][age]" value="2">' +
+        '</form>');
+
+    hash_check(form, {
+        people: [
+            {
+                name: "fred",
+                age: "12"
+            },
+            {
+                name: "bob",
+                age: "14"
+            },
+            {
+                name: "bubba",
+                age: "15"
+            },
+            {
+                name: "frank",
+                age: "2"
+            }
+        ]
+    });
+});
+
+test('bracket notation - bad notation', function() {
+    var form = domify('<form>' +
+        '<input name="[][foo]" value="bar" />' +
+        '<input name="[baz][qux]" value="norf" />' +
+        '</form>');
+
+    hash_check(form, {
+        _values: [
+            { foo: 'bar' }
+        ],
+        baz: { qux: 'norf' }
+    });
 });
 
 test('custom serializer', function() {
