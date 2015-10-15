@@ -109,7 +109,8 @@ function serialize(form, options) {
                     // "foo" and "foo[]" should be arrays.
                     if (options.hash && key.slice(key.length - 2) !== '[]') {
                         result = serializer(result, key + '[]', option.value);
-                    } else {
+                    }
+                    else {
                         result = serializer(result, key, option.value);
                     }
                 }
@@ -169,11 +170,13 @@ function hash_assign(result, keys, value) {
 
         if (Array.isArray(result)) {
             result.push(hash_assign(null, keys, value));
-        } else {
+        }
+        else {
             // This might be the result of bad name attributes like "[][foo]",
             // in this case the original `result` object will already be
             // assigned to an object literal. Rather than coerce the object to
-            // an array the attribute "_values" is assigned as an array.
+            // an array, or cause an exception the attribute "_values" is
+            // assigned as an array.
             result._values = result._values || [];
             result._values.push(hash_assign(null, keys, value));
         }
@@ -184,7 +187,8 @@ function hash_assign(result, keys, value) {
     // Key is an attribute name and can be assigned directly.
     if (!between) {
         result[key] = hash_assign(result[key], keys, value);
-    } else {
+    }
+    else {
         var string = between[1];
         var index = parseInt(string, 10);
 
@@ -193,7 +197,8 @@ function hash_assign(result, keys, value) {
         if (isNaN(index)) {
             result = result || {};
             result[string] = hash_assign(result[string], keys, value);
-        } else {
+        }
+        else {
             result = result || [];
             result[index] = hash_assign(result[index], keys, value);
         }
@@ -212,7 +217,8 @@ function hash_serializer(result, key, value) {
     if (matches) {
         var keys = parse_keys(key);
         hash_assign(result, keys, value);
-    } else {
+    }
+    else {
         // Non bracket notation can make assignments directly.
         var existing = result[key];
 
@@ -228,7 +234,8 @@ function hash_serializer(result, key, value) {
             }
 
             result[key].push(value);
-        } else {
+        }
+        else {
             result[key] = value;
         }
     }
