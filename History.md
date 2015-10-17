@@ -1,3 +1,7 @@
+# UNRELEASED
+
+* add bracket notation support for hash serialization
+
 # 0.6.0 (2015-02-23)
 
 * add options.empty to force serialize empty inputs
