@@ -8,10 +8,8 @@ var k_r_submitter = /^(?:submit|button|image|reset|file)$/i;
 // node names which could be successful controls
 var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 
-// keys with brackets for hash keys
-var object_brackets_regex = /\[(.+?)\]/g;
-var array_brackets_regex = /\[\]$/;
-var brackets_prefix_regex = /^(.+?)\[/;
+// Matches bracket notation.
+var brackets = /(\[[^\[\]]*\])/g;
 
 // serializes form fields
 // @param form MUST be an HTMLForm element
@@ -35,7 +33,7 @@ function serialize(form, options) {
     var result = (options.hash) ? {} : '';
     var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
 
-    var elements = form.elements || [];
+    var elements = form && form.elements ? form.elements : [];
 
     //Object store each radio and set if it's empty or not
     var radio_store = Object.create(null);
@@ -61,7 +59,7 @@ function serialize(form, options) {
         if ((element.type === 'checkbox' || element.type === 'radio') && !element.checked) {
             val = undefined;
         }
-        
+
         // If we want empty elements
         if (options.empty) {
             // for checkbox
@@ -72,10 +70,10 @@ function serialize(form, options) {
             // for radio
             if (element.type === 'radio') {
                 if (!radio_store[element.name] && !element.checked) {
-                    radio_store[element.name] = false
+                    radio_store[element.name] = false;
                 }
                 else if (element.checked) {
-                    radio_store[element.name] = true
+                    radio_store[element.name] = true;
                 }
             }
 
@@ -99,9 +97,22 @@ function serialize(form, options) {
             var isSelectedOptions = false;
             for (var j=0 ; j<selectOptions.length ; ++j) {
                 var option = selectOptions[j];
-                if (option.selected) {
-                    isSelectedOptions = true
-                    result = serializer(result, key, option.value);
+                var allowedEmpty = options.empty && !option.value;
+                var hasValue = (option.value || allowedEmpty);
+                if (option.selected && hasValue) {
+                    isSelectedOptions = true;
+
+                    // If using a hash serializer be sure to add the
+                    // correct notation for an array in the multi-select
+                    // context. Here the name attribute on the select element
+                    // might be missing the trailing bracket pair. Both names
+                    // "foo" and "foo[]" should be arrays.
+                    if (options.hash && key.slice(key.length - 2) !== '[]') {
+                        result = serializer(result, key + '[]', option.value);
+                    }
+                    else {
+                        result = serializer(result, key, option.value);
+                    }
                 }
             }
 
@@ -109,9 +120,10 @@ function serialize(form, options) {
             if (!isSelectedOptions && options.empty) {
                 result = serializer(result, key, '');
             }
-            
+
             continue;
         }
+
         result = serializer(result, key, val);
     }
 
@@ -127,31 +139,109 @@ function serialize(form, options) {
     return result;
 }
 
-// obj/hash encoding serializer
-function hash_serializer(result, key, value) {
-    var is_array_key = has_array_brackets(key);
-    if (is_array_key) {
-        key = key.replace(array_brackets_regex, '');
+function parse_keys(string) {
+    var keys = [];
+    var prefix = /^([^\[\]]*)/;
+    var children = new RegExp(brackets);
+    var match = prefix.exec(string);
+
+    if (match[1]) {
+        keys.push(match[1]);
     }
 
-    if (key in result) {
-        var existing = result[key];
-        if (!Array.isArray(existing)) {
-            result[key] = [existing];
-        }
-        result[key].push(value);
+    while ((match = children.exec(string)) !== null) {
+        keys.push(match[1]);
     }
-    else {
-        if (has_object_brackets(key)) {
-          extract_from_brackets(result, key, value);
+
+    return keys;
+}
+
+function hash_assign(result, keys, value) {
+    if (keys.length === 0) {
+        result = value;
+        return result;
+    }
+
+    var key = keys.shift();
+    var between = key.match(/^\[(.+?)\]$/);
+
+    if (key === '[]') {
+        result = result || [];
+
+        if (Array.isArray(result)) {
+            result.push(hash_assign(null, keys, value));
         }
         else {
-          result[key] = is_array_key ? [value] : value;
+            // This might be the result of bad name attributes like "[][foo]",
+            // in this case the original `result` object will already be
+            // assigned to an object literal. Rather than coerce the object to
+            // an array, or cause an exception the attribute "_values" is
+            // assigned as an array.
+            result._values = result._values || [];
+            result._values.push(hash_assign(null, keys, value));
+        }
+
+        return result;
+    }
+
+    // Key is an attribute name and can be assigned directly.
+    if (!between) {
+        result[key] = hash_assign(result[key], keys, value);
+    }
+    else {
+        var string = between[1];
+        var index = parseInt(string, 10);
+
+        // If the characters between the brackets is not a number it is an
+        // attribute name and can be assigned directly.
+        if (isNaN(index)) {
+            result = result || {};
+            result[string] = hash_assign(result[string], keys, value);
+        }
+        else {
+            result = result || [];
+            result[index] = hash_assign(result[index], keys, value);
         }
     }
 
     return result;
-};
+}
+
+// Object/hash encoding serializer.
+function hash_serializer(result, key, value) {
+    var matches = key.match(brackets);
+
+    // Has brackets? Use the recursive assignment function to walk the keys,
+    // construct any missing objects in the result tree and make the assignment
+    // at the end of the chain.
+    if (matches) {
+        var keys = parse_keys(key);
+        hash_assign(result, keys, value);
+    }
+    else {
+        // Non bracket notation can make assignments directly.
+        var existing = result[key];
+
+        // If the value has been assigned already (for instance when a radio and
+        // a checkbox have the same name attribute) convert the previous value
+        // into an array before pushing into it.
+        //
+        // NOTE: If this requirement were removed all hash creation and
+        // assignment could go through `hash_assign`.
+        if (existing) {
+            if (!Array.isArray(existing)) {
+                result[key] = [ existing ];
+            }
+
+            result[key].push(value);
+        }
+        else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
 
 // urlform encoding serializer
 function str_serialize(result, key, value) {
@@ -162,67 +252,6 @@ function str_serialize(result, key, value) {
     // spaces should be '+' rather than '%20'.
     value = value.replace(/%20/g, '+');
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
-};
-
-function has_object_brackets(string) {
-  return string.match(object_brackets_regex);
-};
-
-function has_array_brackets(string) {
-    return string.match(array_brackets_regex);
 }
-
-function matches_between_brackets(string) {
-    // Make sure to isolate object_brackets_regex from .exec() calls
-    var regex = new RegExp(object_brackets_regex);
-    var matches = [];
-    var match;
-
-    while (match = regex.exec(string)) {
-      matches.push(match[1]);
-    }
-
-    return matches;
-};
-
-function extract_from_brackets(result, key, value) {
-    var prefix = key.match(brackets_prefix_regex)[1];
-
-    // Set the key if it doesn't exist
-    if (! result[prefix]) result[prefix] = {};
-
-    var parent = result[prefix];
-    var matches_between = matches_between_brackets(key);
-    var length = matches_between.length;
-
-    for (var i = 0; i < length; i++) {
-        var child = matches_between[i];
-        var isLast = (length === i + 1);
-
-        if (isLast) {
-            var existing = parent[child];
-
-            if (existing) {
-                if (! Array.isArray(existing)) {
-                    parent[child] = [ existing ];
-                }
-
-                parent[child].push(value);
-            }
-            else {
-                // Finally make the assignment
-                parent[child] = value;
-            }
-
-        }
-        else {
-            // This is a nested key, set it properly for the next iteration
-            parent[child] = parent[child] || {};
-            parent = parent[child];
-        }
-    }
-
-    parent = value;
-};
 
 module.exports = serialize;

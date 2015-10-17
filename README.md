@@ -90,6 +90,54 @@ var str = serialize(form);
 
 ```
 
+### indexed arrays
+
+Adding numbers between brackets for the array notation above will result in a hash serialization with explicit ordering based on the index number regardless of element ordering.
+
+Like the "[explicit array fields](explicit-array-fields)" this does not affect url-encoding mode output in any way.
+
+```html
+<form id="todos-form">
+	<input type="text" name="todos[1]" value="milk" />
+	<input type="text" name="todos[0]" value="eggs" />
+	<input type="text" name="todos[2]" value="flour" />
+</form>
+```
+
+```js
+var serialize = require('form-serialize');
+var form = document.querySelector('#todos-form');
+
+var obj = serialize(form, { hash: true });
+// obj -> { todos: ['eggs', 'milk', 'flour'] }
+
+var str = serialize(form);
+// str -> "todos[1]=milk&todos[0]=eggs&todos[2]=flour"
+
+```
+
+### nested objects
+
+Similar to the indexed array notation, attribute names can be added by inserting a string value between brackets. The notation can be used to create deep objects and mixed with the array notation.
+
+Like the "[explicit array fields](explicit-array-fields)" this does not affect url-encoding mode output.
+
+```html
+<form id="nested-example">
+	<input type="text" name="foo[bar][baz]" value="qux" />
+	<input type="text" name="foo[norf][]" value="item 1" />
+</form>
+```
+
+```js
+var serialize = require('form-serialize');
+var form = document.querySelector('#todos-form');
+
+var obj = serialize(form, { hash: true });
+// obj -> { foo: { bar: { baz: 'qux' } }, norf: [ 'item 1' ] }
+
+```
+
 ## references
 
 This module is based on ideas from jQuery serialize and the Form.serialize method from the prototype library
