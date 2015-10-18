@@ -59,7 +59,7 @@ See the example serializers in the index.js source file.
 
 ## notes
 
-only [successfull control](http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2) form fields are serialized (with the exception of disabled fields if disabled option is set)
+only [successful control](http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2) form fields are serialized (with the exception of disabled fields if disabled option is set)
 
 multiselect fields with more than one value will result in an array of values in the `hash` output mode using the default hash serializer
 
