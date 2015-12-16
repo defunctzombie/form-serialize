@@ -474,3 +474,13 @@ test('custom serializer', function() {
     "node": "ZUUL"
   });
 });
+
+test('submit controls option', function() {
+  var form = domify('<form>' +
+      '<input type="text" name="node" value="foo" />' +
+      '<input type="submit" name="submitter" value="Submit" />' +
+      '</form>');
+
+  assert.deepEqual(serialize(form), "node=foo");
+  assert.deepEqual(serialize(form, {submit: true, hash: false}), "node=foo&submitter=Submit");
+});
