@@ -39,7 +39,7 @@ Returns a serialized form of a HTMLForm element. Output is determined by the ser
 
 arg | type | desc
 :--- | :--- | :---
-form | HTMLForm | must be an HTMLForm element
+form | HTMLElement | must be an HTMLElement
 options | Object | optional options object
 
 #### options

@@ -33,7 +33,10 @@ function serialize(form, options) {
     var result = (options.hash) ? {} : '';
     var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
 
-    var elements = form && form.elements ? form.elements : [];
+    var elements = [];
+    if (form) {
+        elements = form.elements || form.querySelectorAll('input, textarea, select, button, datalist, keygen, output');
+    }
 
     //Object store each radio and set if it's empty or not
     var radio_store = Object.create(null);
