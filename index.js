@@ -254,4 +254,6 @@ function str_serialize(result, key, value) {
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
 }
 
-module.exports = serialize;
+if ("undefined" !== typeof module) {
+    module.exports = serialize;
+}
