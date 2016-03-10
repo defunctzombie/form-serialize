@@ -11,6 +11,12 @@ var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 // Matches bracket notation.
 var brackets = /(\[[^\[\]]*\])/g;
 
+// Matches the whole string
+function matchExact(regex, str) {
+    var match = str.match(regex);
+    return match != null && str == match[0];
+}
+
 // serializes form fields
 // @param form MUST be an HTMLForm element
 // @param options is an optional argument to configure the serialization. Default output
@@ -190,17 +196,19 @@ function hash_assign(result, keys, value) {
     }
     else {
         var string = between[1];
-        var index = parseInt(string, 10);
 
-        // If the characters between the brackets is not a number it is an
-        // attribute name and can be assigned directly.
-        if (isNaN(index)) {
-            result = result || {};
-            result[string] = hash_assign(result[string], keys, value);
-        }
-        else {
+        var isDigit = matchExact(/^\d+$/, string)
+
+        if (isDigit) {
+            var index = parseInt(string, 10);
             result = result || [];
             result[index] = hash_assign(result[index], keys, value);
+        }
+        else {
+            // If the characters between the brackets is not a number it is an
+            // attribute name and can be assigned directly.
+            result = result || {};
+            result[string] = hash_assign(result[string], keys, value);
         }
     }
 
