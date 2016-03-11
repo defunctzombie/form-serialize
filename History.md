@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.7.1 (2016-03-11)
 
 * fix bracket notation number parsing (de5d19)
 
