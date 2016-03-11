@@ -11,7 +11,8 @@
     "zuul": "~3.6.0"
   },
   "scripts": {
-    "test": "zuul -- test/index.js"
+    "test": "zuul -- test/index.js",
+    "test-local": "zuul --local -- test/index.js"
   },
   "repository": {
     "type": "git",
