@@ -317,6 +317,31 @@ test('bracket notation - hashes', function() {
     });
 });
 
+test('bracket notation - hashes with a digit as the first symbol in a key', function() {
+    var form = domify('<form>' +
+        '<input type="text" name="somekey[123abc][first]" value="first_value">' +
+        '<input type="text" name="somekey[123abc][second]" value="second_value">' +
+        '</form>');
+
+    hash_check(form, {
+        'somekey': {
+            '123abc': {
+                'first': 'first_value',
+                'second': 'second_value'
+            }
+        }
+    });
+
+    empty_check_hash(form, {
+        'somekey': {
+            '123abc': {
+                'first': 'first_value',
+                'second': 'second_value'
+            }
+        }
+    });
+});
+
 test('bracket notation - select multiple', function() {
     var form = domify('<form>' +
         '<select name="foo" multiple>' +

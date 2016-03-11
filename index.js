@@ -190,7 +190,10 @@ function hash_assign(result, keys, value) {
     }
     else {
         var string = between[1];
-        var index = parseInt(string, 10);
+        // +var converts the variable into a number
+        // better than parseInt because it doesn't truncate away trailing
+        // letters and actually fails if whole thing is not a number
+        var index = +string;
 
         // If the characters between the brackets is not a number it is an
         // attribute name and can be assigned directly.
