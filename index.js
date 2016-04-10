@@ -197,7 +197,10 @@ function hash_assign(result, keys, value) {
 
         // If the characters between the brackets is not a number it is an
         // attribute name and can be assigned directly.
-        if (isNaN(index)) {
+        //
+        // If we process the first record and it is non-zero we assume it's a sparse array
+        // and use a hash instead of an array to avoid very large sparse arrays
+        if (isNaN(index) || (result === undefined && index !== 0)) {
             result = result || {};
             result[string] = hash_assign(result[string], keys, value);
         }
