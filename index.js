@@ -124,6 +124,10 @@ function serialize(form, options) {
             continue;
         }
 
+        if (options.normalizer) {
+            val = options.normalizer(val, element);
+        }
+
         result = serializer(result, key, val);
     }
 

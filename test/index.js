@@ -499,3 +499,18 @@ test('custom serializer', function() {
     "node": "ZUUL"
   });
 });
+
+test('normalizer', function() {
+  var form = domify('<form><input type="number" name="foo" value="1" /></form>');
+
+  assert.strictEqual(serialize(form, {
+    hash:true,
+    normalizer: function(val, element) {
+      if (element.type != 'number') {
+        return val;
+      } else {
+        return parseInt(val, 10);
+      }
+    }
+  }).foo, 1);
+});
