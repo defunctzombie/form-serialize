@@ -22,6 +22,8 @@ var brackets = /(\[[^\[\]]*\])/g;
 //    hash and url encoded str serializers are provided with this module
 //    - disabled: [true | false]. If true serialize disabled fields.
 //    - empty: [true | false]. If true serialize empty fields
+//    - allowTags: [RegExp]. HTML Tags to be parsed. Defaults above.
+//    - ignoreTags: [RegExp]. HTML Tags to be ignored. Defaults above.
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -29,6 +31,9 @@ function serialize(form, options) {
     else if (options.hash === undefined) {
         options.hash = true;
     }
+
+    options.ignoreTags = options.ignoreTags || k_r_submitter;
+    options.allowTags = options.allowTags   || k_r_success_contrls;
 
     var result = (options.hash) ? {} : '';
     var serializer = options.serializer || ((options.hash) ? hash_serializer : str_serialize);
@@ -46,8 +51,8 @@ function serialize(form, options) {
             continue;
         }
         // ignore anyhting that is not considered a success field
-        if (!k_r_success_contrls.test(element.nodeName) ||
-            k_r_submitter.test(element.type)) {
+        if (!options.allowTags.test(element.nodeName) ||
+            options.ignoreTags.test(element.type)) {
             continue;
         }
 
