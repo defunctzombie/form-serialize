@@ -256,6 +256,19 @@ test('radio - single default', function() {
     });
 });
 
+test('radio - empty value', function() {
+    var form = domify('<form>' +
+        '<input type="radio" name="foo" value="" checked="checked"/>' +
+        '<input type="radio" name="foo" value="bar2"/>' +
+        '</form>');
+    hash_check(form, {});
+    str_check(form, '');
+    empty_check(form, 'foo=');
+    empty_check_hash(form, {
+        'foo':''
+    });
+});
+
 // in this case the radio buttons and checkboxes share a name key
 // the checkbox value should still be honored
 test('radio w/checkbox', function() {
