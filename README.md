@@ -1,4 +1,4 @@
-# form-serialize [![Build Status](https://travis-ci.org/defunctzombie/form-serialize.png?branch=master)](https://travis-ci.org/defunctzombie/form-serialize)
+# form-serialize [![Build Status](https://travis-ci.org/defunctzombie/form-serialize.svg?branch=master)](https://travis-ci.org/defunctzombie/form-serialize)
 
 serialize form fields to submit a form over ajax
 
