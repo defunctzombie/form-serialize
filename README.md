@@ -48,6 +48,7 @@ option | type | default | desc
 :--- | :--- | :---: | :---
 hash | boolean | false | if `true`, the hash serializer will be used for `serializer` option
 serializer | function | url-encoding | override the default serializer (hash or url-encoding)
+normalizer | function | undefined | override the value of the serialized form
 disabled | boolean | false | if `true`, disabled fields will also be serialized
 empty | boolean | false | if `true`, empty fields will also be serialized
 
@@ -56,6 +57,34 @@ empty | boolean | false | if `true`, empty fields will also be serialized
 Serializers take 3 arguments: `result`, `key`, `value` and should return a newly updated result.
 
 See the example serializers in the index.js source file.
+
+### normalizer
+
+Normalizer take 2 arguments: `val` and `element` and should return a newly updated value.
+
+```html
+<form id="example-form">
+	<input type="text" name="foo" value="bar"/>
+	<input type="number" name="baz" value="1"/>
+	<input type="submit" value="do it!"/>
+</form>
+```
+
+```js
+var serialize = require('form-serialize');
+var form = document.querySelector('#example-form');
+
+var obj = serialize(form, {
+    hash:true,
+    normalizer: function(val, element) {
+      if (element.type != 'number') {
+        return val;
+      } else {
+        return parseInt(val, 10);
+      }
+});
+// obj -> { foo: 'bar', baz: 1 }
+```
 
 ## notes
 
