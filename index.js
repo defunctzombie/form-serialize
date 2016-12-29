@@ -22,6 +22,7 @@ var brackets = /(\[[^\[\]]*\])/g;
 //    hash and url encoded str serializers are provided with this module
 //    - disabled: [true | false]. If true serialize disabled fields.
 //    - empty: [true | false]. If true serialize empty fields
+//    - submit: [true | false]. If true serialize submission fields
 function serialize(form, options) {
     if (typeof options != 'object') {
         options = { hash: !!options };
@@ -41,13 +42,14 @@ function serialize(form, options) {
     for (var i=0 ; i<elements.length ; ++i) {
         var element = elements[i];
 
-        // ingore disabled fields
+        // ignore disabled fields
         if ((!options.disabled && element.disabled) || !element.name) {
             continue;
         }
-        // ignore anyhting that is not considered a success field
+        // ignore anything that is not considered a success field
+        // unless the submit option is specified
         if (!k_r_success_contrls.test(element.nodeName) ||
-            k_r_submitter.test(element.type)) {
+            k_r_submitter.test(element.type) && !options.submit) {
             continue;
         }
 
