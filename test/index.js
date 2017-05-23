@@ -1,3 +1,4 @@
+/* globals test */
 var assert = require('assert');
 var domify = require('domify');
 
@@ -12,15 +13,15 @@ var str_check = function(form, exp) {
 };
 
 var disabled_check = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : false, disabled: true }), exp);
+    assert.deepEqual(serialize(form, { hash: false, disabled: true }), exp);
 };
 
 var empty_check = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : false, disabled: true, empty: true }), exp);
+    assert.deepEqual(serialize(form, { hash: false, disabled: true, empty: true }), exp);
 };
 
 var empty_check_hash = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : true, disabled: true, empty: true }), exp);
+    assert.deepEqual(serialize(form, { hash: true, disabled: true, empty: true }), exp);
 };
 
 test('null form', function() {
@@ -130,8 +131,8 @@ test('checkboxes', function() {
         '<input type="checkbox" name="baz" checked/>' +
         '</form>');
     hash_check(form, {
-        'foo': "on",
-        'baz': "on"
+        'foo': 'on',
+        'baz': 'on'
     });
     str_check(form, 'foo=on&baz=on');
     empty_check(form, 'foo=on&bar=&baz=on');
@@ -237,7 +238,7 @@ test('radio - no default', function() {
     str_check(form, '');
     empty_check(form, 'foo=');
     empty_check_hash(form, {
-        'foo':''
+        'foo': ''
     });
 });
 
@@ -265,7 +266,7 @@ test('radio - empty value', function() {
     str_check(form, '');
     empty_check(form, 'foo=');
     empty_check_hash(form, {
-        'foo':''
+        'foo': ''
     });
 });
 
@@ -382,7 +383,6 @@ test('bracket notation - select multiple', function() {
     });
 });
 
-
 test('bracket notation - select multiple, nested', function() {
     var form = domify('<form>' +
         '<select name="foo[bar]" multiple>' +
@@ -432,9 +432,9 @@ test('bracket notation - non-indexed arrays', function() {
 
     hash_check(form, {
         people: [
-            { name: "fred" },
-            { name: "bob" },
-            { name: "bubba" },
+            { name: 'fred' },
+            { name: 'bob' },
+            { name: 'bubba' }
         ]
     });
 });
@@ -447,7 +447,7 @@ test('bracket notation - nested, non-indexed arrays', function() {
 
     hash_check(form, {
         user: {
-            tags: [ "cow", "milk" ],
+            tags: [ 'cow', 'milk' ]
         }
     });
 });
@@ -467,20 +467,20 @@ test('bracket notation - indexed arrays', function() {
     hash_check(form, {
         people: [
             {
-                name: "fred",
-                age: "12"
+                name: 'fred',
+                age: '12'
             },
             {
-                name: "bob",
-                age: "14"
+                name: 'bob',
+                age: '14'
             },
             {
-                name: "bubba",
-                age: "15"
+                name: 'bubba',
+                age: '15'
             },
             {
-                name: "frank",
-                age: "2"
+                name: 'frank',
+                age: '2'
             }
         ]
     });
@@ -501,14 +501,14 @@ test('bracket notation - bad notation', function() {
 });
 
 test('custom serializer', function() {
-  var form = domify('<form><input type="text" name="node" value="zuul">/</form>');
+    var form = domify('<form><input type="text" name="node" value="zuul">/</form>');
 
-  assert.deepEqual(serialize(form, {
-    serializer: function(curry, k, v) {
-      curry[k] = 'ZUUL';
-      return curry;
-    }
-  }), {
-    "node": "ZUUL"
-  });
+    assert.deepEqual(serialize(form, {
+        serializer: function(curry, k, v) {
+            curry[k] = 'ZUUL';
+            return curry;
+        }
+    }), {
+        'node': 'ZUUL'
+    });
 });

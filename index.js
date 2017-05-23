@@ -1,3 +1,6 @@
+(function () {
+/* eslint-disable indent */
+
 // get successful control from form and assemble into object
 // http://www.w3.org/TR/html401/interact/forms.html#h-17.13.2
 
@@ -23,7 +26,7 @@ var brackets = /(\[[^\[\]]*\])/g;
 //    - disabled: [true | false]. If true serialize disabled fields.
 //    - empty: [true | false]. If true serialize empty fields
 function serialize(form, options) {
-    if (typeof options != 'object') {
+    if (typeof options !== 'object') {
         options = { hash: !!options };
     }
     else if (options.hash === undefined) {
@@ -35,13 +38,13 @@ function serialize(form, options) {
 
     var elements = form && form.elements ? form.elements : [];
 
-    //Object store each radio and set if it's empty or not
+    // Object store each radio and set if it's empty or not
     var radio_store = Object.create(null);
 
     for (var i=0 ; i<elements.length ; ++i) {
         var element = elements[i];
 
-        // ingore disabled fields
+        // ignore disabled fields
         if ((!options.disabled && element.disabled) || !element.name) {
             continue;
         }
@@ -78,7 +81,7 @@ function serialize(form, options) {
             }
 
             // if options empty is true, continue only if its radio
-            if (val == undefined && element.type == 'radio') {
+            if (val === undefined && element.type === 'radio') {
                 continue;
             }
         }
@@ -257,4 +260,11 @@ function str_serialize(result, key, value) {
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
 }
 
-module.exports = serialize;
+if (typeof module !== 'undefined') {
+    module.exports = serialize;
+} else {
+    window.formSerialize = serialize;
+}
+
+/* eslint-enable indent */
+}());
