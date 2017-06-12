@@ -59,6 +59,18 @@ test('single element', function() {
     });
 });
 
+test('single element in non-form element', function() {
+    var form = domify('<tr><input type="text" name="foo" value="bar"/></tr>');
+    hash_check(form, {
+        'foo': 'bar'
+    });
+    str_check(form, 'foo=bar');
+    empty_check(form, 'foo=bar');
+    empty_check_hash(form, {
+        'foo': 'bar'
+    });
+});
+
 test('ignore no value', function() {
     var form = domify('<form><input type="text" name="foo"/></form>');
     hash_check(form, {});
