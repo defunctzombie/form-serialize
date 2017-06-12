@@ -1,10 +1,10 @@
-var assert = require('assert');
+var assert = require('core-assert');
 var domify = require('domify');
 
 var serialize = require('../');
 
 var hash_check = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash: true }), exp);
+    assert.deepStrictEqual(serialize(form, { hash: true }), exp);
 };
 
 var str_check = function(form, exp) {
@@ -12,15 +12,15 @@ var str_check = function(form, exp) {
 };
 
 var disabled_check = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : false, disabled: true }), exp);
+    assert.deepStrictEqual(serialize(form, { hash : false, disabled: true }), exp);
 };
 
 var empty_check = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : false, disabled: true, empty: true }), exp);
+    assert.deepStrictEqual(serialize(form, { hash : false, disabled: true, empty: true }), exp);
 };
 
 var empty_check_hash = function(form, exp) {
-    assert.deepEqual(serialize(form, { hash : true, disabled: true, empty: true }), exp);
+    assert.deepStrictEqual(serialize(form, { hash : true, disabled: true, empty: true }), exp);
 };
 
 test('null form', function() {
@@ -439,6 +439,20 @@ test('bracket notation - non-indexed arrays', function() {
     });
 });
 
+test('bracket notation - sparse array', function() {
+    var form = domify('<form>' +
+        '<input name="user[1234]" value="cow" />' +
+        '<input name="user[4567]" value="milk" />' +
+        '</form>');
+
+    hash_check(form, {
+        user: {
+            1234: "cow",
+            4567: "milk",
+        }
+    });
+});
+
 test('bracket notation - nested, non-indexed arrays', function() {
     var form = domify('<form>' +
         '<input name="user[tags][]" value="cow" />' +
@@ -465,6 +479,40 @@ test('bracket notation - indexed arrays', function() {
         '</form>');
 
     hash_check(form, {
+        people: {
+            0: {
+                name: "fred",
+                age: "12"
+            },
+            1: {
+                name: "bob",
+                age: "14"
+            },
+            2: {
+                name: "bubba",
+                age: "15"
+            },
+            3: {
+                age: "2"
+            },
+            _values: [
+                {name: "frank"}
+            ]
+        }
+    });
+});
+
+test('bracket notation - ordered indexed arrays', function() {
+    var form = domify('<form>' +
+        '<input name="people[0][name]" value="fred" />' +
+        '<input name="people[0][age]" value="12" />' +
+        '<input name="people[1][name]" value="bob" />' +
+        '<input name="people[1][age]" value="14" />' +
+        '<input name="people[][name]" value="frank">' +
+        '<input name="people[2][age]" value="2">' +
+        '</form>');
+
+    hash_check(form, {
         people: [
             {
                 name: "fred",
@@ -473,10 +521,6 @@ test('bracket notation - indexed arrays', function() {
             {
                 name: "bob",
                 age: "14"
-            },
-            {
-                name: "bubba",
-                age: "15"
             },
             {
                 name: "frank",
