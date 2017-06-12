@@ -1,4 +1,4 @@
-# UNRELEASED
+# 0.7.2 (2017-06-11)
 
 * Serialize properly radio input with empty value (1b7a042)
 
