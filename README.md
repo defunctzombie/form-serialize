@@ -22,7 +22,10 @@ Lets serialize the following html form:
 
 ```js
 var serialize = require('form-serialize');
+
 var form = document.querySelector('#example-form');
+// or
+var form = 'example-form';
 
 var str = serialize(form);
 // str -> "foo=bar"
@@ -39,7 +42,7 @@ Returns a serialized form of a HTMLForm element. Output is determined by the ser
 
 arg | type | desc
 :--- | :--- | :---
-form | HTMLForm | must be an HTMLForm element
+form | HTMLForm or String | must be an HTMLForm element or id HTMLForm element
 options | Object | optional options object
 
 #### options
