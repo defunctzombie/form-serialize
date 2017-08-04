@@ -12,7 +12,7 @@ var k_r_success_contrls = /^(?:input|select|textarea|keygen)/i;
 var brackets = /(\[[^\[\]]*\])/g;
 
 // serializes form fields
-// @param form MUST be an HTMLForm element
+// @param form MUST be an HTMLForm element or the HTMLForm id
 // @param options is an optional argument to configure the serialization. Default output
 // with no options specified is a url encoded string
 //    - hash: [true | false] Configure the output type. If true, the output will
@@ -23,8 +23,15 @@ var brackets = /(\[[^\[\]]*\])/g;
 //    - disabled: [true | false]. If true serialize disabled fields.
 //    - empty: [true | false]. If true serialize empty fields
 function serialize(form, options) {
+    if (typeof form == 'string') {
+        form = document.getElementById(form)
+    }
+
     if (typeof options != 'object') {
         options = { hash: !!options };
+    }
+    else if (options.hash === undefined) {
+        options.hash = true;
     }
     else if (options.hash === undefined) {
         options.hash = true;
@@ -257,4 +264,6 @@ function str_serialize(result, key, value) {
     return result + (result ? '&' : '') + encodeURIComponent(key) + '=' + value;
 }
 
-module.exports = serialize;
+if ( typeof module != "undefined" ){
+    module.exports = serialize;
+}
