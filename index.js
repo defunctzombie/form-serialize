@@ -63,8 +63,8 @@ function serialize(form, options) {
         // If we want empty elements
         if (options.empty) {
             // for checkbox
-            if (element.type === 'checkbox' && !element.checked) {
-                val = '';
+            if (element.type === 'checkbox') {
+                val = element.checked;
             }
 
             // for radio
